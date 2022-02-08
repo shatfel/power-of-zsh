@@ -1,0 +1,59 @@
+#!/usr/bin/env zsh
+
+## vars
+typeset -A _C
+
+_C=(
+  ifCount 2
+  forceDelete "${forceDelete:=false}"
+
+  if0 "tap0"
+  if0Addr "192.168.1.50"
+  if0Prefix "24"
+
+  if1 "tap1"
+  if1Addr "192.168.1.60"
+  if1Prefix "24"
+  )
+
+
+###
+## ifsUp()
+###
+ifsUp() {
+  local i=0
+
+  while [[ ${i} -lt ${_C[ifCount]} ]]; do
+    ## interface name
+    local _if="${_C[`printf if${i}`]}"
+
+    printf "/i/ configuring interface ${_if}\n"
+
+    [[ `ifconfig -a | grep ${_if} | wc -l` != 0 ]] && {
+      printf "/i/ looks line interface ${_if} already configured .. checking for deleting .. \n"
+
+      ## check for force deleting interface
+      [[ ${_C[forceDelete]} != "true" ]] && {
+        printf "/i/ stay interface ${_if} as is .. \n"
+        let i=$i+1
+        continue
+        }
+
+      ## if force 
+        printf "/i/ selected force deleting interfaces .. \n"
+        ip tuntap del dev ${_if} mode tap
+      }
+
+    printf "/i/ creating interface ${_if} .. \n"
+    ip tuntap add dev ${_if} mode tap
+
+    printf "/i/ configuring network on ${_if} .. \n"
+    ifconfig ${_if} inet ${_C[`printf "if${i}Addr"`]}/${_C[`printf "if${i}Prefix"`]} up
+
+    let i=$i+1
+    done
+  }
+
+
+##
+ifsUp
