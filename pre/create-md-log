@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+
+for c in "forceDelete=false" "forceDelete=true" "" ; do printf "\n## \`${c} ./net-up\`\n\n" ; printf "\n### \`ifconfig -a|grep tap\`\n\n\`\`\`shell\n" ; ifconfig -a|grep --color=no tap; printf "\n\`\`\`\n\n"; printf "\`\`\`shell\n";  [[ ${c} != "" ]] && { export ${c}; ./net-up ; printf "\`\`\`\n"; continue }; ./net-up; printf "\`\`\`\n"; done
