@@ -1,0 +1,87 @@
+#!/usr/bin/env zsh
+
+## config
+_config="`dirname ${0}`/net.conf"
+
+## vars
+typeset -A _C
+
+
+
+###
+## check config
+###
+checkConfig() {
+  [[ ! -f ${_config} ]] && {
+    printf "/e/ ${_config} not exists .. exit ..\n"
+    exit 1
+    }
+
+  return 1
+  }
+
+
+###
+## load config
+###
+loadConfig() {
+  printf "/i/ loading config  ${_config} .. \n"
+  . ${_config}
+
+  _C=(
+    ifCount 2
+    forceDelete "${forceDelete:=false}"
+  
+    if0 "tap0"
+    if0Addr "${_externalAddr}"
+    if0Prefix "24"
+  
+    if1 "tap1"
+    if1Addr "${_internalAddr}"
+    if1Prefix "24"
+    )
+  }
+
+###
+## ifsUp()
+###
+ifsUp() {
+  local i=0
+
+  while [[ ${i} -lt ${_C[ifCount]} ]]; do
+    ## interface name
+    local _if="${_C[`printf if${i}`]}"
+
+    printf "\n/i/ configuring interface ${_if}\n"
+
+    [[ `ifconfig -a | grep ${_if} | wc -l` != 0 ]] && {
+      printf "/i/ looks line interface ${_if} already configured .. checking for deleting .. \n"
+
+      ## check for force deleting interface
+      [[ ${_C[forceDelete]} != "true" ]] && {
+        printf "/i/ stay interface ${_if} as is .. \n"
+        let i=$i+1
+        continue
+        }
+
+      ## if force 
+        printf "/i/ selected force deleting interfaces .. \n"
+        ip tuntap del dev ${_if} mode tap
+      }
+
+    printf "/i/ creating interface ${_if} .. \n"
+    ip tuntap add dev ${_if} mode tap
+
+    printf "/i/ configuring network on ${_if} .. \n"
+    [[ $debug ]] && \
+      printf "ifconfig ${_if} inet ${_C[`printf \"if${i}Addr\"`]}/${_C[`printf \"if${i}Prefix\"`]} up"
+      ifconfig ${_if} inet ${_C[`printf "if${i}Addr"`]}/${_C[`printf "if${i}Prefix"`]} up
+
+    let i=$i+1
+    done
+  }
+
+
+##
+[[ checkConfig ]] && loadConfig
+ifsUp

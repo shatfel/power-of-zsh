@@ -1,0 +1,57 @@
+#!/usr/bin/env zsh
+
+
+## vars
+_config="`dirname ${0}`/net.conf"
+_hostName="${_externalName:=UNSET}"
+_hostAddr="${_externalAddr:=UNSET}"
+
+###
+## check config
+###
+checkConfig() {
+  [[ ! -f ${_config} ]] && {
+    printf "/e/ ${_config} not exists .. exit ..\n"
+    exit 1
+    }
+
+  return 1
+  }
+
+
+###
+## load config
+###
+loadConfig() {
+  printf "/i/ loading config  ${_config} .. \n"
+  . ${_config}
+
+  _hostName="${_externalName}"
+  _hostAddr="${_externalAddr}"
+  }
+
+###
+## check /etc/hosts
+###
+checkHostname() {
+  ## if exists
+  [[ `grep ${_hostName} /etc/hosts|wc -l` != 0 ]] && {
+    printf "/i/ host already exists .. exit .. \n"
+    exit 2
+    }
+  }
+
+###
+## add host
+###
+addHost() {
+  printf "/i/ adding ${_hostName} to /etc/hosts .. \n"
+  printf "## add ${_hostName} for tasks `date +"%Y-%m-%d %H:%M"`\n${_hostAddr} ${_hostName} `printf "${_hostName}" | cut -d'.' -f 1`" >> /etc/hosts
+  }
+
+
+
+##
+[[ checkConfig ]] && loadConfig
+checkHostname
+addHost
