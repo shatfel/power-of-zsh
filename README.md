@@ -2,46 +2,87 @@
 
 А ващЬ `bash` так могёт???))))))
 
-[net-up](net-up)
+## Файлы
 
+1. [net.conf](pre/net.conf) - конфиг
+2. [net-up](pre/net-up) - настройка сети
+3. [host-config](pre/host-config) - настройка /etc/hosts
+4. [create-md-log](pre/create-md-log) - генерация примеров ниже.
 ## Примеры
 
-### Удалять, если существует интерфейс и сконфигурировать
+### `forceDelete=false ./net-up`
+
+
+#### `ifconfig -a|grep tap`
 
 ```shell
-# forceDelete=true ./net-up
-/i/ configuring interface tap0
-/i/ looks line interface tap0 already configured .. checking for deleting ..
-/i/ selected force deleting interfaces ..
-/i/ creating interface tap0 ..
-/i/ configuring network on tap0 ..
-/i/ configuring interface tap1
-/i/ looks line interface tap1 already configured .. checking for deleting ..
-/i/ selected force deleting interfaces ..
-/i/ creating interface tap1 ..
-/i/ configuring network on tap1 ..
+tap0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+tap1: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+
 ```
 
-### Пропустить интерфейс, если существует
-
 ```shell
-# forceDelete=false ./net-up
+/i/ loading config  ./net.conf .. 
+
 /i/ configuring interface tap0
-/i/ looks line interface tap0 already configured .. checking for deleting ..
-/i/ stay interface tap0 as is ..
+/i/ looks line interface tap0 already configured .. checking for deleting .. 
+/i/ stay interface tap0 as is .. 
+
 /i/ configuring interface tap1
-/i/ looks line interface tap1 already configured .. checking for deleting ..
-/i/ stay interface tap1 as is ..
+/i/ looks line interface tap1 already configured .. checking for deleting .. 
+/i/ stay interface tap1 as is .. 
 ```
 
-### И самый наглядный пример
+### `forceDelete=true ./net-up`
+
+
+#### `ifconfig -a|grep tap`
 
 ```shell
-# forceDelete=false ./net-up
+tap0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+tap1: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+
+```
+
+```shell
+/i/ loading config  ./net.conf .. 
+
 /i/ configuring interface tap0
-/i/ creating interface tap0 ..
-/i/ configuring network on tap0 ..
+/i/ looks line interface tap0 already configured .. checking for deleting .. 
+/i/ selected force deleting interfaces .. 
+/i/ creating interface tap0 .. 
+/i/ configuring network on tap0 .. 
+
 /i/ configuring interface tap1
-/i/ looks line interface tap1 already configured .. checking for deleting ..
-/i/ stay interface tap1 as is ..
+/i/ looks line interface tap1 already configured .. checking for deleting .. 
+/i/ selected force deleting interfaces .. 
+/i/ creating interface tap1 .. 
+/i/ configuring network on tap1 .. 
+```
+
+### ` ./net-up`
+
+
+#### `ifconfig -a|grep tap`
+
+```shell
+tap0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+tap1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+
+```
+
+```shell
+/i/ loading config  ./net.conf .. 
+
+/i/ configuring interface tap0
+/i/ looks line interface tap0 already configured .. checking for deleting .. 
+/i/ selected force deleting interfaces .. 
+/i/ creating interface tap0 .. 
+/i/ configuring network on tap0 .. 
+
+/i/ configuring interface tap1
+/i/ looks line interface tap1 already configured .. checking for deleting .. 
+/i/ selected force deleting interfaces .. 
+/i/ creating interface tap1 .. 
+/i/ configuring network on tap1 .. 
 ```
